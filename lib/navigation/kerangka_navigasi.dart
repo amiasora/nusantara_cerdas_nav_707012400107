@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../models/pengajuan_model.dart';
+import '../cubit/pengajuan_cubit.dart';
 import 'app_routes.dart';
 import '../pages/beranda.dart';
 import '../pages/layanan.dart';
@@ -321,7 +321,6 @@ class _KerangkaNavigasiState
     );
   }
 }
-
 class _IkonWargaDenganBadge extends StatelessWidget {
   final bool dipilih;
 
@@ -331,19 +330,21 @@ class _IkonWargaDenganBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalPengajuan =
-        context.select<PengajuanModel, int>(
-      (model) => model.totalPengajuan,
-    );
-
-    return Badge(
-      isLabelVisible: totalPengajuan > 0,
-      label: Text('$totalPengajuan'),
-      child: Icon(
-        dipilih
-            ? Icons.person
-            : Icons.person_outline,
-      ),
+    return BlocSelector<PengajuanCubit, List<String>, int>(
+      selector: (daftarPengajuan) {
+        return daftarPengajuan.length;
+      },
+      builder: (context, totalPengajuan) {
+        return Badge(
+          isLabelVisible: totalPengajuan > 0,
+          label: Text('$totalPengajuan'),
+          child: Icon(
+            dipilih
+                ? Icons.person
+                : Icons.person_outline,
+          ),
+        );
+      },
     );
   }
 }

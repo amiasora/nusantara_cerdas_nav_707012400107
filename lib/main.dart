@@ -1,95 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'models/favorit_model.dart';
-import 'models/pengajuan_model.dart';
+import 'cubit/favorit_cubit.dart';
+import 'cubit/pengajuan_cubit.dart';
 
 import 'navigation/app_routes.dart';
 import 'navigation/kerangka_navigasi.dart';
 
-
 void main() {
-
   runApp(
-
-    MultiProvider(
-
+    MultiBlocProvider(
       providers: [
-
-        ChangeNotifierProvider(
-          create: (context) => FavoritModel(),
+        BlocProvider<FavoritCubit>(
+          create: (context) => FavoritCubit(),
         ),
-
-
-        ChangeNotifierProvider(
-          create: (context) => PengajuanModel(),
+        BlocProvider<PengajuanCubit>(
+          create: (context) => PengajuanCubit(),
         ),
-
       ],
-
-
       child: const NusantaraCerdasMobile(),
-
     ),
-
   );
-
 }
 
-
-
 class NusantaraCerdasMobile extends StatelessWidget {
-
-  const NusantaraCerdasMobile({
-    super.key,
-  });
-
+  const NusantaraCerdasMobile({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
-
-
       title: 'Nusantara Cerdas Mobile',
-
-
       theme: ThemeData(
-
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.teal,
         ),
-
         useMaterial3: true,
-
       ),
-
-
       initialRoute: AppRoutes.kerangka,
-
-
       routes: {
-
         AppRoutes.kerangka:
-            (_) => const KerangkaNavigasi(),
-
-
+            (context) => const KerangkaNavigasi(),
         ...AppRoutes.daftarRoute(),
-
       },
-
-
-      onGenerateRoute:
-          AppRoutes.bentukRoute,
-
-
-      onUnknownRoute:
-          AppRoutes.routeTidakDikenal,
-
+      onGenerateRoute: AppRoutes.bentukRoute,
+      onUnknownRoute: AppRoutes.routeTidakDikenal,
     );
-
   }
-
 }

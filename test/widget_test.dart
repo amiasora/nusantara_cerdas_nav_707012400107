@@ -1,30 +1,117 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:nusantara_cerdas_nav_707012400107/main.dart';
+import 'package:nusantara_cerdas_nav_707012400107/main.dart'
+    as app;
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  const ukuranLayar = <String, Size>{
+    'layar sempit': Size(390, 844),
+    'layar lebar': Size(1200, 900),
+  };
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  for (final kasus in ukuranLayar.entries) {
+    testWidgets(
+      'Favorit dan pengajuan bekerja pada ${kasus.key}',
+      (WidgetTester tester) async {
+        tester.view.devicePixelRatio = 1.0;
+        tester.view.physicalSize = kasus.value;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+        // Memulai aplikasi dengan provider dari main().
+        await tester.pumpWidget(const SizedBox.shrink());
+        app.main();
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+
+        // Memeriksa navigasi sesuai ukuran layar.
+        if (kasus.key == 'layar sempit') {
+          expect(
+            find.byType(NavigationBar),
+            findsOneWidget,
+          );
+          expect(
+            find.byType(NavigationRail),
+            findsNothing,
+          );
+        } else {
+          expect(
+            find.byType(NavigationRail),
+            findsOneWidget,
+          );
+          expect(
+            find.byType(NavigationBar),
+            findsNothing,
+          );
+        }
+
+        // Menandai Izin Usaha dari halaman Layanan.
+        await tester.tap(find.text('Layanan'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(
+          find.byTooltip('Tandai sebagai favorit').first,
+        );
+        await tester.pump();
+
+        // Memastikan favorit tersedia di halaman Warga.
+        await tester.tap(find.text('Warga'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Izin Usaha'), findsOneWidget);
+
+        // Membuka rincian melalui named route.
+        await tester.tap(find.text('Izin Usaha'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Detail Layanan'),
+          findsOneWidget,
+        );
+
+        // Memeriksa indikator sebelum pengajuan selesai.
+        await tester.tap(find.text('Ajukan Permohonan'));
+        await tester.pump();
+
+        expect(find.text('Mengirim...'), findsOneWidget);
+        expect(
+          find.byType(CircularProgressIndicator),
+          findsOneWidget,
+        );
+
+        // Menyelesaikan waktu simulasi pengiriman.
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Total pengajuan: 1'),
+          findsOneWidget,
+        );
+
+        // Nama layanan muncul pada favorit dan keranjang.
+        expect(find.text('Izin Usaha'), findsNWidgets(2));
+
+        final badgeSatu = find.descendant(
+          of: find.byType(Badge),
+          matching: find.text('1'),
+        );
+
+        expect(badgeSatu, findsWidgets);
+
+        // Memastikan badge tetap tersedia di Beranda.
+        await tester.tap(find.text('Beranda'));
+        await tester.pumpAndSettle();
+
+        expect(badgeSatu, findsWidgets);
+        expect(tester.takeException(), isNull);
+
+        // Menutup aplikasi dan membersihkan state tes.
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      },
+    );
+  }
 }
