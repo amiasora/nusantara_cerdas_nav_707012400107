@@ -38,6 +38,8 @@ class Beranda extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Beranda'),
@@ -48,18 +50,15 @@ class Beranda extends StatelessWidget {
         children: [
           Text(
             'Nusantara Cerdas',
-            style: Theme.of(context)
-                .textTheme
-                .headlineMedium
-                ?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: tema.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Kota yang maju, terhubung, dan berkelanjutan.',
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: tema.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 24),

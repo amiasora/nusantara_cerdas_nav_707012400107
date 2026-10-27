@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/favorit_cubit.dart';
 import '../cubit/pengajuan_cubit.dart';
+import '../cubit/theme_cubit.dart';
 import '../navigation/app_routes.dart';
 import 'layanan.dart';
 
@@ -68,6 +69,9 @@ class Warga extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final modeGelap = tema.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Warga'),
@@ -75,6 +79,29 @@ class Warga extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          // Sakelar untuk mengubah tema seluruh aplikasi.
+          Card(
+            child: SwitchListTile(
+              secondary: Icon(
+                modeGelap
+                    ? Icons.dark_mode_outlined
+                    : Icons.light_mode_outlined,
+              ),
+              title: const Text('Mode gelap'),
+              subtitle: const Text(
+                'Gunakan tampilan gelap pada seluruh aplikasi.',
+              ),
+              value: modeGelap,
+              onChanged: (aktif) {
+                context
+                    .read<ThemeCubit>()
+                    .ubahModeGelap(aktif);
+              },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           const Text(
             'Layanan Favorit',
             style: TextStyle(
@@ -110,9 +137,9 @@ class Warga extends StatelessWidget {
                 children: favorit.map((namaLayanan) {
                   return Card(
                     child: ListTile(
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.star,
-                        color: Colors.amber,
+                        color: tema.colorScheme.primary,
                       ),
                       title: Text(namaLayanan),
                       trailing: const Icon(
@@ -132,6 +159,7 @@ class Warga extends StatelessWidget {
           ),
 
           const SizedBox(height: 24),
+
           const Text(
             'Keranjang Pengajuan',
             style: TextStyle(
@@ -195,6 +223,7 @@ class Warga extends StatelessWidget {
                   }),
 
                   const SizedBox(height: 12),
+
                   FilledButton.icon(
                     onPressed: () {
                       kirimSemuaPengajuan(context);
@@ -210,6 +239,7 @@ class Warga extends StatelessWidget {
           ),
 
           const SizedBox(height: 24),
+
           const Text(
             'Riwayat Laporan',
             style: TextStyle(
@@ -218,6 +248,7 @@ class Warga extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+
           const Card(
             child: ListTile(
               leading: Icon(Icons.description),
@@ -225,6 +256,7 @@ class Warga extends StatelessWidget {
               subtitle: Text('Status: Diproses'),
             ),
           ),
+
           const Card(
             child: ListTile(
               leading: Icon(Icons.description),

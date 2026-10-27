@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'cubit/favorit_cubit.dart';
 import 'cubit/pengajuan_cubit.dart';
+import 'cubit/theme_cubit.dart';
 
 import 'navigation/app_routes.dart';
 import 'navigation/kerangka_navigasi.dart';
+
+import 'theme/app_theme.dart';
 
 void main() {
   runApp(
@@ -16,6 +19,9 @@ void main() {
         ),
         BlocProvider<PengajuanCubit>(
           create: (context) => PengajuanCubit(),
+        ),
+        BlocProvider<ThemeCubit>(
+          create: (context) => ThemeCubit(),
         ),
       ],
       child: const NusantaraCerdasMobile(),
@@ -28,23 +34,24 @@ class NusantaraCerdasMobile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Nusantara Cerdas Mobile',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.teal,
-        ),
-        useMaterial3: true,
-      ),
-      initialRoute: AppRoutes.kerangka,
-      routes: {
-        AppRoutes.kerangka:
-            (context) => const KerangkaNavigasi(),
-        ...AppRoutes.daftarRoute(),
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, modeTema) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Nusantara Cerdas Mobile',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: modeTema,
+          initialRoute: AppRoutes.kerangka,
+          routes: {
+            AppRoutes.kerangka:
+                (context) => const KerangkaNavigasi(),
+            ...AppRoutes.daftarRoute(),
+          },
+          onGenerateRoute: AppRoutes.bentukRoute,
+          onUnknownRoute: AppRoutes.routeTidakDikenal,
+        );
       },
-      onGenerateRoute: AppRoutes.bentukRoute,
-      onUnknownRoute: AppRoutes.routeTidakDikenal,
     );
   }
 }

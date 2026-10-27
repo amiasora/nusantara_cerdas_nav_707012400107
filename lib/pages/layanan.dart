@@ -137,6 +137,8 @@ class Layanan extends StatelessWidget {
                     return favorit.contains(nama);
                   },
                   builder: (context, sudahFavorit) {
+                    final warna = Theme.of(context).colorScheme;
+
                     return IconButton(
                       tooltip: sudahFavorit
                           ? 'Batalkan favorit'
@@ -146,8 +148,8 @@ class Layanan extends StatelessWidget {
                             ? Icons.star
                             : Icons.star_border,
                         color: sudahFavorit
-                            ? Colors.amber
-                            : null,
+                            ? warna.primary
+                            : warna.onSurfaceVariant,
                       ),
                       onPressed: () {
                         final favoritCubit =
